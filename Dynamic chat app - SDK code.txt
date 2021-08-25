@@ -1,0 +1,74 @@
+<!-- HTML code -->
+
+<!-- The core Firebase JS SDK required for the project --> (inside head)
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<!-- Greet user --> (inside body)
+<div id="container">
+        <div id="user-options">
+            <div>Hi, <span id="name"></span></div>
+            <div id="change-name">change name</div>
+        </div>
+</div>
+
+<!-- Form for new messages -->
+    <form id="message-form">
+        <input type="text" id="message-input" placeholder="message" required>
+        <button class="orange-button">send</button>
+    </form>
+
+
+
+--------------------------------------------------------------------------------------
+<!-- JS code -->
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "provided apiKey",
+    authDomain: "provided authDomain",
+    databaseURL: "provided databaseURL",
+    projectId: "provided projectId",
+    storageBucket: "provided storageBucket",
+    messagingSenderId: "provided messagingSenderId",
+    appId: "provided appId"
+  }
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+
+// Access firestore using firebase object obtained from the CDN
+var db = firebase.firestore();
+
+// Prompt for name
+if (!localStorage.getItem('name')) {
+	name = prompt('What is your name?')
+	localStorage.setItem('name', name)
+} else {
+	name = localStorage.getItem('name')
+}
+document.querySelector('#name').innerText = name
+
+// Change name
+document.querySelector('#change-name').addEventListener('click', () => {
+	name = prompt('What is your name?')
+	localStorage.setItem('name', name)
+	document.querySelector('#name').innerText = name
+})
+
+// Form event listener
+document.querySelector('#message-form').addEventListener('submit', e => {
+	e.preventDefault();
+	let message = document.querySelector('#message-input').value 
+    // Saving messages to database
+	db.collection('messages')
+	.add({
+		name: name,
+		message: message
+	})
+	.then((docRef) => {
+		console.log(`Document written with ID: ${docRef.id}`);
+		document.querySelector('#message-form').reset()
+	})
+	.catch((error) => {
+		console.error(`Error adding document: ${error}`);
+	});
+})
